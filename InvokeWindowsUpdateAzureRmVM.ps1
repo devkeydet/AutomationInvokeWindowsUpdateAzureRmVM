@@ -7,7 +7,6 @@
 # https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-windows-winrm/ 
 # http://www.techdiction.com/?s=WinRM
 
-
 Param(
    [string]$EnvironmentName = "AzureCloud",
    [Parameter(mandatory=$true)]
@@ -17,12 +16,8 @@ Param(
 )
 
 $Conn = Get-AutomationConnection -Name AzureRunAsConnection
-
-Write-Output "Get-AutomationConnection using AzureRunAsConnection succeeded..."
  
 Add-AzureRMAccount -ServicePrincipal -Tenant $Conn.TenantID -ApplicationID $Conn.ApplicationID -CertificateThumbprint $Conn.CertificateThumbprint -EnvironmentName $EnvironmentName
-
-Write-Output "Add-AzureRMAccount succeeded..."
 
 $Credential = Get-AutomationPSCredential -Name $PSCredentialName
 
