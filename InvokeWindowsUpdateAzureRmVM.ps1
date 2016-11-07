@@ -9,10 +9,9 @@
 
 
 Param(
-   #[string]$VMName,
    [string]$EnvironmentName = "AzureCloud",
    [Parameter(mandatory=$true)]
-   [string]$ConnectionUri, #example: "*.eastus.cloudapp.azure.com *or* IP"
+   [string]$ComputerName, #example: "*.eastus.cloudapp.azure.com *or* IP"
    [Parameter(mandatory=$true)]
    [string]$PSCredentialName
 )
@@ -34,7 +33,7 @@ Write-Output "Connecting to VM and installing updates..."
 # https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-windows-winrm/
 Try
 {
-    Invoke-Command -ComputerName $ConnectionUri -UseSSL -Credential $Credential -ErrorAction Stop `
+    Invoke-Command -ComputerName $ComputerName -UseSSL -Credential $Credential -ErrorAction Stop `
         -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate `
         -ScriptBlock `
         {
@@ -72,7 +71,7 @@ While ($UnableToReconnect)
 {
     Try
     {
-        $Logs = Invoke-Command -ComputerName $ConnectionUri -UseSSL -Credential $Credential -ErrorAction Stop `
+        $Logs = Invoke-Command -ComputerName $ComputerName -UseSSL -Credential $Credential -ErrorAction Stop `
             -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate `
             -ScriptBlock `
             {
