@@ -1,4 +1,4 @@
-﻿# For simplicity, this script accesses the VM over https via public IP/DNS label.  
+﻿# For simplicity, this script accesses the VM using PowerShell Remoting over https using via public IP/DNS label.  
 # If you prefer to not expose VMs over the public internet you could consider using Azure Automation Hybrid Runbook Workers:
 # https://azure.microsoft.com/en-us/documentation/articles/automation-hybrid-runbook-worker/#starting-runbooks-on-hybrid-runbook-worker
 #
@@ -12,7 +12,7 @@ Param(
    #[string]$VMName,
    [string]$EnvironmentName = "AzureCloud",
    [Parameter(mandatory=$true)]
-   [string]$ConnectionUri, #example: "https://*.eastus.cloudapp.azure.com:5986"
+   [string]$ConnectionUri, #example: "*.eastus.cloudapp.azure.com *or* IP"
    [Parameter(mandatory=$true)]
    [string]$PSCredentialName
 )
@@ -32,23 +32,31 @@ Write-Output "Connecting to VM and installing updates..."
 # This script assumes that WinRM is already configured on the VM using a self signed cert.  
 # There are a number of ways to accomplish this.  See the instructions below for examples:
 # https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-windows-winrm/
-Invoke-Command -ConnectionUri $ConnectionUri -Credential $Credential `
-    -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate `
-    -ScriptBlock `
-    {
-        # Script assumes the following moduels are installed on the remote computer
-        # https://www.powershellgallery.com/packages/PSWindowsUpdate/1.5.2.2
-        # https://www.powershellgallery.com/packages/TaskRunner/1.0
-        #
-        # There are a number of ways to get these on the VM.  In my example:
-        # [INSERT BLOG URL]
-        # ...I use Azure Automation DSC:
-        # https://azure.microsoft.com/en-us/documentation/articles/automation-dsc-overview/
-        # You can get instructions on how to download the script and deploy in the blog post above. 
-        New-Item C:\UpdateWindows.ps1 -type file -force `
-            -value "Get-WUInstall -AcceptAll -AutoReboot -IgnoreUserInput | Out-File C:\PSWindowsUpdate.log"
-        RunTask -coreScriptFilePath "C:\UpdateWindows.ps1" -waitForCompletion $true -cleanup $true        
-    }
+Try
+{
+    Invoke-Command -ComputerName $ConnectionUri -UseSSL -Credential $Credential -ErrorAction Stop `
+        -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate `
+        -ScriptBlock `
+        {
+            # Script assumes the following moduels are installed on the remote computer
+            # https://www.powershellgallery.com/packages/PSWindowsUpdate/1.5.2.2
+            # https://www.powershellgallery.com/packages/TaskRunner/1.0
+            #
+            # There are a number of ways to get these on the VM.  In my example:
+            # [INSERT BLOG URL]
+            # ...I use Azure Automation DSC:
+            # https://azure.microsoft.com/en-us/documentation/articles/automation-dsc-overview/
+            # You can get instructions on how to download the script and deploy in the blog post above. 
+            New-Item C:\UpdateWindows.ps1 -type file -force `
+                -value "Get-WUInstall -AcceptAll -AutoReboot -IgnoreUserInput | Out-File C:\PSWindowsUpdate.log"
+            RunTask -coreScriptFilePath "C:\UpdateWindows.ps1" -waitForCompletion $true -cleanup $true        
+        }
+}
+Catch
+{
+    Write-Output "Failed to connect to VM.  Exiting..."
+    Exit
+}
 
 Write-Output "Checking for reboot..."
 
@@ -64,7 +72,7 @@ While ($UnableToReconnect)
 {
     Try
     {
-        $Logs = Invoke-Command -ConnectionUri $ConnectionUri -Credential $Credential -ErrorAction Stop `
+        $Logs = Invoke-Command -ComputerName $ConnectionUri -UseSSL -Credential $Credential -ErrorAction Stop `
             -SessionOption (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck) -Authentication Negotiate `
             -ScriptBlock `
             {
