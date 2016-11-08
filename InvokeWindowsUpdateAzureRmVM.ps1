@@ -48,7 +48,7 @@ Try
 }
 Catch
 {
-    Write-Output "Failed to connect to VM.  Exiting..."
+    Write-Error "Failed to connect to VM.  Exiting..."
     Exit
 }
 
