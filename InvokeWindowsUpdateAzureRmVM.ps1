@@ -1,4 +1,4 @@
-﻿# For simplicity, this script accesses the VM using PowerShell Remoting over ssl using via public IP/DNS label.  
+﻿# For simplicity, this script accesses the VM using PowerShell Remoting over ssl via public IP/DNS label.  
 # If you prefer to not expose VMs over the public internet you could consider using Azure Automation Hybrid Runbook Workers:
 # https://azure.microsoft.com/en-us/documentation/articles/automation-hybrid-runbook-worker/#starting-runbooks-on-hybrid-runbook-worker
 #
