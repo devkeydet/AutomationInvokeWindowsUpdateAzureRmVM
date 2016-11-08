@@ -37,7 +37,7 @@ Try
             # https://www.powershellgallery.com/packages/TaskRunner/1.0
             #
             # There are a number of ways to get these on the VM.  In my example:
-            # [INSERT BLOG URL]
+            # http://bit.ly/2fvNiq2
             # ...I use Azure Automation DSC:
             # https://azure.microsoft.com/en-us/documentation/articles/automation-dsc-overview/
             # You can get instructions on how to download the script and deploy in the blog post above. 
