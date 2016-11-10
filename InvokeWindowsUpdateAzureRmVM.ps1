@@ -10,6 +10,8 @@
 Param(
    [string]$EnvironmentName = "AzureCloud",
    [Parameter(mandatory=$true)]
+   # If you want to get the computer name based on the VM name, consider using the runbook below:
+   # https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/Connect-AzureVM.ps1
    [string]$ComputerName, #example: "*.eastus.cloudapp.azure.com *or* IP"
    [Parameter(mandatory=$true)]
    [string]$PSCredentialName
@@ -26,6 +28,9 @@ Write-Output "Connecting to VM and installing updates..."
 # This script assumes that WinRM is already configured on the VM using a self signed cert.  
 # There are a number of ways to accomplish this.  See the instructions below for examples:
 # https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-windows-winrm/
+#
+# Another option would be to use the runbook below ahead of calling this runbook:
+# https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/Connect-AzureVM.ps1
 Try
 {
     Invoke-Command -ComputerName $ComputerName -UseSSL -Credential $Credential -ErrorAction Stop `
