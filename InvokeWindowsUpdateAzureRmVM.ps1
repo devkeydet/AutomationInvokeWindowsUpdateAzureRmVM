@@ -10,7 +10,7 @@
 Param(
    [string]$EnvironmentName = "AzureCloud",
    [Parameter(mandatory=$true)]
-   # If you want to get the computer name based on the VM name, consider using the runbook below:
+   # If you want to get the computer name based on the VM name, have a look at thisrunbook below:
    # https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/Connect-AzureVM.ps1
    [string]$ComputerName, #example: "*.eastus.cloudapp.azure.com *or* IP"
    [Parameter(mandatory=$true)]
@@ -29,7 +29,7 @@ Write-Output "Connecting to VM and installing updates..."
 # There are a number of ways to accomplish this.  See the instructions below for examples:
 # https://azure.microsoft.com/en-us/documentation/articles/virtual-machines-windows-winrm/
 #
-# Another option would be to use the runbook below ahead of calling this runbook:
+# Another option would be to do what's done in this runbook below:
 # https://raw.githubusercontent.com/azureautomation/runbooks/master/Utility/ARM/Connect-AzureVM.ps1
 Try
 {
